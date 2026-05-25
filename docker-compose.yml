@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_backend
+    volumes:
+      - ollama_storage:/root/.ollama
+      - ./ollama-entrypoint.sh:/ollama-entrypoint.sh
+    ports:
+      - "11434:11434"
+    entrypoint: ["/bin/bash", "/ollama-entrypoint.sh"]
+
+  vulnerable-app:
+    build: ./app
+    container_name: vulnerable_rh_bot
+    ports:
+      - "8501:8501"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    depends_on:
+      - ollama
+
+volumes:
+  ollama_storage:
